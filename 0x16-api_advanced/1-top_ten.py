@@ -1,38 +1,33 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+
 """
-1-top_ten.py - prints the titles of the first 10 hot posts
-for a given subreddit using the Reddit API
+prints the titles of the first 10 hot posts listed for a given subreddit
 """
-import requests
+
+from requests import get
 
 
 def top_ten(subreddit):
     """
-    Prints the titles of the first 10 hot posts for a given subreddit
-    If the subreddit is invalid, prints None
+    function that queries the Reddit API and prints the titles of the first
+    10 hot posts listed for a given subreddit
     """
-    # Construct the URL for the subreddit's hot posts endpoint
-    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
 
-    # Set a custom User-Agent to avoid API restrictions
-    headers = {"User-Agent": "custom_user_agent"}
+    if subreddit is None or not isinstance(subreddit, str):
+        print("None")
+
+    user_agent = {'User-agent': 'Google Chrome Version 81.0.4044.129'}
+    params = {'limit': 10}
+    url = 'https://www.reddit.com/r/{}/hot/.json'.format(subreddit)
+
+    response = get(url, headers=user_agent, params=params)
+    results = response.json()
 
     try:
-        # Send a GET request to the Reddit API
-        response = requests.get(url, headers=headers, params={"limit": 10})
+        my_data = results.get('data').get('children')
 
-        # Check if the request was successful (status code 200)
-        if response.status_code == 200:
-            # Parse the JSON response to extract post titles
-            data = response.json()
-            posts = data['data']['children']
+        for i in my_data:
+            print(i.get('data').get('title'))
 
-            # Print the titles of the first 10 posts
-            for post in posts:
-                print(post['data']['title'])
-        else:
-            # Print None for invalid subreddits or other errors
-            print(None)
-    except Exception as e:
-        # Print an error message if an exception occurs during the request
-        print(f"Error: {e}")
+    except Exception:
+        print("None")
